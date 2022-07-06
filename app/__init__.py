@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 import config
 
-db=SQLAlchemy()
+db: SQLAlchemy=SQLAlchemy()
 # flask db init 로 데베 초기화
 # flask db upgrade
 migrate=Migrate()
@@ -19,10 +19,15 @@ def create_app(): # 애플리케이션 팩토리
     from . import models
 
     # 블루프린트
-    from views import main_views, question_views, answer_view
+    from views import main_views, question_views, answer_view, auth_views
     app.register_blueprint(main_views.bp)
     app.register_blueprint(question_views.bp)
     app.register_blueprint(answer_view.bp)
+    app.register_blueprint(auth_views.bp)
+
+    # 필터
+    from .filter import format_datetime
+    app.jinja_env.filters['datetime'] = format_datetime
 
     return app
 
