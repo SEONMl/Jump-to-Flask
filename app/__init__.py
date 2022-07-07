@@ -1,10 +1,9 @@
 from flaskext.markdown import Markdown
-from flask import Flask
+from flask import Flask, render_template
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
 
-import config
 
 naming_convention = {
     "ix": 'ix_%(column_0_label)s',
@@ -20,9 +19,14 @@ migrate = Migrate()
 # flask db init 로 데베 초기화
 # flask db upgrade
 
+
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+
 def create_app(): # 애플리케이션 팩토리
     app = Flask(__name__)
-    app.config.from_object(config)
+    app.config.from_envvar('APP_CONFIG_FILE')
 
     # markdown
     Markdown(app, extensions=['nl2br', 'fenced_code'])
@@ -45,6 +49,9 @@ def create_app(): # 애플리케이션 팩토리
     # 필터
     from .filter import format_datetime
     app.jinja_env.filters['datetime'] = format_datetime
+
+    # 오류페이지
+    app.regist_error_handler(404, page_not_found)
 
     return app
 
